@@ -94,7 +94,7 @@ function raymarch(rayOrigin, rayDir, maxSteps, maxDist, epsilon) {
 		const dist = SDF(point, { x: 0, y: 0, z: 0 }, 1);
 
 		if (dist < epsilon) {
-			return { hit: true, point, steps: i };
+			return { hit: true, point, steps: i, totalDistance };
 		}
 
 		if (totalDistance > maxDist) {
@@ -167,8 +167,8 @@ function render() {
 			const result = raymarch(cameraPos, rayDir, maxSteps, maxDist, epsilon);
 
 			if (result.hit) {
-				const normal = normalize(subtract(result.point, { x: 0, y: 0, z: 0 }));
-				const lightIntensity = Math.max(0, dot(normal, normalize(lightDir)));
+				const sigmoid = (x) => -((2 / (1 + Math.exp(x/10))) - 1);
+				const lightIntensity = Math.max(0, 1-sigmoid(result.totalDistance));
 
 				const ch = shadings[1 + ~~(lightIntensity*(shadings.length - 1))];
 				backgroundArray[y][x] = ch;
@@ -179,5 +179,17 @@ function render() {
 	}
 }
 
+function animate() {
+	render();
+	refreshBackground();
+	cameraPos.x += Math.sqrt(2)/200;
+	cameraPos.y += Math.sqrt(3)/200;
+	cameraDir.x += Math.sqrt(2)/400;
+	cameraDir.y += Math.sqrt(3)/400;
+	cameraDir.z += Math.sqrt(4)/400;
+	window.requestAnimationFrame(animate);
+}
+
 render();
 refreshBackground();
+animate();
