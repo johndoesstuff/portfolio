@@ -2,6 +2,8 @@ let background = document.getElementById("background");
 
 let shadings = " .,-+=%#".split("");
 
+let unicodes = "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩΪΫάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώЁЂЃЄЅІЇЈЉЊЋЌЍЎЏАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюяѐёђѓєѕіїјљњћќѝўџҐґỲỳ–—―‗‘’‚“”„†‡•…‰‹›‼‾⁄ⁿ₣₤₧€№™Ω⅛⅜⅝⅞←↑→↓↔↕∂∆∏∑−∙√∞∟∩∫≈≠≡≤≥⌂⌐⌠⌡─│┌┐└┘├┤┬┴┼═║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬▀▄".split("");
+
 window.backgroundArray = null;
 
 function getBgSize() {
@@ -199,6 +201,8 @@ window.onresize = function() {
 
 let mouse = { x: 0, y: 0, asciiX: 0, asciiY: 0 };
 
+let particles = [];
+
 window.onmousemove = function(e) {
 	mouse.x = e.clientX;
 	mouse.y = e.clientY;
@@ -208,23 +212,48 @@ window.onmousemove = function(e) {
 }
 
 function addMouseRandom() {
-	for (let i = 0; i < 25; i++) {
+	for (let i = 0; i < 3; i++) {
 		addMouseParticle();
+	}
+	tickParticles();
+	const xCon = window.backgroundArray[0].length / window.innerWidth;
+	const yCon = window.backgroundArray.length / window.innerHeight;
+	for (let i = 0; i < particles.length; i++) {
+		let px = particles[i].x * xCon;
+		let py = particles[i].y * yCon;
+		px = ~~px;
+		py = ~~py;
+		px = Math.max(0, Math.min(px, window.backgroundArray[0].length - 1));
+		py = Math.max(0, Math.min(py, window.backgroundArray.length - 1));
+		window.backgroundArray[py][px] = particles[i].ch;
 	}
 }
 
 function addMouseParticle() {
 	const theta = Math.random() * 2 * Math.PI;
-	const r = 5*Math.random()*Math.random();
+	const r = 50*Math.random()*Math.random();
 	let x = r*Math.cos(theta);
 	let y = r*Math.sin(theta);
-	x += mouse.asciiX;
-	y += mouse.asciiY;
+	x += mouse.x;
+	y += mouse.y;
+	const ch = unicodes[~~(Math.random() * unicodes.length)];
 
-	x = ~~Math.max(0, Math.min(x, window.backgroundArray[0].length - 1));
-	y = ~~Math.max(0, Math.min(y, window.backgroundArray.length - 1));
+	particles.push({ ch, x, y, xvel: 5*(Math.random() - 0.5), yvel: 5*(Math.random() - 0.5), lifetime: 0 });
+}
 
-	window.backgroundArray[y][x] = "$";
+function tickParticles() {
+	for (let i = 0; i < particles.length; i++) {
+		particles[i].lifetime++;
+		particles[i].x += particles[i].xvel;
+		particles[i].y += particles[i].yvel;
+		particles[i].xvel /= 1.02;
+		particles[i].yvel /= 1.02;
+		particles[i].yvel -= 0.3;
+		if (Math.random() * 100 < particles[i].lifetime) {
+			particles.splice(i, 1);
+			i--;
+		}
+	}
 }
 
 render();
