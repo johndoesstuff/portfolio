@@ -5,7 +5,7 @@ window.backgroundArray = null;
 function getBgSize() {
 	let screenWidth = window.innerWidth;
 	let screenHeight = window.innerHeight;
-	let charElement = document.createElement("div");
+	let charElement = document.createElement("pre");
 	charElement.innerText = ("M".repeat(100) + "\n").repeat(100);
 	charElement.style.visibility = 'hidden';
 	charElement.id = "charTester";
@@ -36,7 +36,11 @@ function initializeBackground() {
 
 	window.backgroundArray = JSON.parse(JSON.stringify(Array(row).fill(Array(col).fill("#"))));
 
-	background.innerText = window.backgroundArray.map(e => e.join("")).join("\n");
+	refreshBackground();
 }
 
 initializeBackground();
+
+function refreshBackground() {
+	background.innerText = window.backgroundArray.map(e => e.join("")).join("\n");
+}
