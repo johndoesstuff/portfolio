@@ -1,3 +1,27 @@
 body {
-	background: red;
+	background: #dedbd5;
+	color: #292827;
+	font-family: "JetBrains Mono", serif;
+	margin: 0;
+}
+
+#name {
+	text-align: center;
+}
+
+#content-wrapper {
+	margin-left: 20vw;
+	margin-right: 20vw;
+	background: orange;
+}
+
+#background, #charTester {
+	position: absolute;
+	width: 100vw;
+	height: 100vh;
+	background: #dedbd5;
+	margin: 0;
+	top: 0;
+	z-index: -1;
+	color: white;
 }
