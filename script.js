@@ -143,9 +143,9 @@ function render() {
 	const width = backgroundArray[0].length;
 	const height = backgroundArray.length;
 
-	const maxSteps = 25;
+	const maxSteps = 15;
 	const maxDist = 100;
-	const epsilon = 1e-5;
+	const epsilon = 1e-3;
 
 	const aspectRatio = window.innerWidth / window.innerHeight;
 
@@ -181,6 +181,7 @@ function render() {
 
 function animate() {
 	render();
+	addMouseRandom();
 	refreshBackground();
 	cameraPos.x += Math.sqrt(2)/200;
 	cameraPos.y += Math.sqrt(3)/200;
@@ -190,6 +191,43 @@ function animate() {
 	window.requestAnimationFrame(animate);
 }
 
+window.onresize = function() {
+	initializeBackground();
+}
+
+//mouse effects
+
+let mouse = { x: 0, y: 0, asciiX: 0, asciiY: 0 };
+
+window.onmousemove = function(e) {
+	mouse.x = e.clientX;
+	mouse.y = e.clientY;
+
+	mouse.asciiX = mouse.x / window.innerWidth * window.backgroundArray[0].length;
+	mouse.asciiY = mouse.y / window.innerHeight * window.backgroundArray.length;
+}
+
+function addMouseRandom() {
+	for (let i = 0; i < 25; i++) {
+		addMouseParticle();
+	}
+}
+
+function addMouseParticle() {
+	const theta = Math.random() * 2 * Math.PI;
+	const r = 5*Math.random()*Math.random();
+	let x = r*Math.cos(theta);
+	let y = r*Math.sin(theta);
+	x += mouse.asciiX;
+	y += mouse.asciiY;
+
+	x = ~~Math.max(0, Math.min(x, window.backgroundArray[0].length - 1));
+	y = ~~Math.max(0, Math.min(y, window.backgroundArray.length - 1));
+
+	window.backgroundArray[y][x] = "$";
+}
+
 render();
 refreshBackground();
 animate();
+
