@@ -27,6 +27,17 @@ h1, h2, h3 {
 	box-shadow: 0 0 0 2.5px #00006b inset;
 }
 
+#buttons {
+	display: flex;
+	justify-content: space-between;
+	width: 60%;
+	margin: auto;
+}
+
+a {
+	padding: 1vw;
+}
+
 #background {
 	position: absolute;
 	width: 100vw;
