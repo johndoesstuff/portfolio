@@ -6,6 +6,8 @@ let unicodes = "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩΪΫάέήίΰ
 
 window.backgroundArray = null;
 
+document.getElementById("copyright-year").innerText = (new Date()).getFullYear();
+
 function getBgSize() {
 	let screenWidth = window.innerWidth;
 	let screenHeight = window.innerHeight;
@@ -145,7 +147,7 @@ function render() {
 	const width = backgroundArray[0].length;
 	const height = backgroundArray.length;
 
-	const maxSteps = 15;
+	const maxSteps = 30;
 	const maxDist = 100;
 	const epsilon = 1e-3;
 
@@ -169,7 +171,7 @@ function render() {
 			const result = raymarch(cameraPos, rayDir, maxSteps, maxDist, epsilon);
 
 			if (result.hit) {
-				const sigmoid = (x) => -((2 / (1 + Math.exp(x/10))) - 1);
+				const sigmoid = (x) => -((2 / (1 + Math.exp(x/7))) - 1);
 				const lightIntensity = Math.max(0, 1-sigmoid(result.totalDistance));
 
 				const ch = shadings[1 + ~~(lightIntensity*(shadings.length - 1))];
@@ -185,11 +187,11 @@ function animate() {
 	render();
 	addMouseRandom();
 	refreshBackground();
-	cameraPos.x += Math.sqrt(2)/200;
-	cameraPos.y += Math.sqrt(3)/200;
-	cameraDir.x += Math.sqrt(2)/400;
-	cameraDir.y += Math.sqrt(3)/400;
-	cameraDir.z += Math.sqrt(4)/400;
+	cameraPos.x = Math.sqrt(2)*(new Date).getTime()/2e4;
+	cameraPos.y = Math.sqrt(3)*(new Date).getTime()/2e4;
+	cameraDir.x = Math.sqrt(2)*(new Date).getTime()/4e4;
+	cameraDir.y = Math.sqrt(3)*(new Date).getTime()/4e4;
+	cameraDir.z = Math.sqrt(4)*(new Date).getTime()/4e4;
 	window.requestAnimationFrame(animate);
 }
 
