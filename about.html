@@ -9,6 +9,9 @@
 	<link rel="stylesheet" href="about/style.css">
 </head>
 <body>
+	<div id="loading-screen">
+		<div class="loader">-</div>
+	</div>
 	<div id="content-wrapper">
 		<div>
 			<h1>About</h1>
@@ -33,5 +36,10 @@
 		</div>
 	</div>
 	<script src="about/script.js"></script>
+	<script>
+		window.addEventListener("load", function () {
+			document.getElementById("loading-screen").classList.add("hidden");
+		})
+	</script>
 </body>
 </html>

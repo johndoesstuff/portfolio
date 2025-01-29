@@ -11,6 +11,18 @@
 	<link rel="stylesheet" href="home/style.css">
 </head>
 <body>
+	<div id="loading-screen">
+		<div class="loader" id="loading-text">-</div>
+	</div>
+	<script>
+		function spinLoadingWheel() {
+			const frames = "-/|\\".split("");
+			let load = document.getElementById("loading-text");
+			load.innerText = frames[(frames.indexOf(load.innerText) + 1) % frames.length];
+			setTimeout(spinLoadingWheel, 100);
+		}
+		spinLoadingWheel();
+	</script>
 	<pre id="background">
 
 	</pre>
@@ -29,5 +41,10 @@
 		</div>
 	</div>
 	<script src="home/script.js"></script>
+	<script>
+		window.addEventListener("load", function () {
+			document.getElementById("loading-screen").classList.add("hidden");
+		})
+	</script>
 </body>
 </html>
