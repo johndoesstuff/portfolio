@@ -50,4 +50,10 @@ h1 {
 	visibility: hidden;
 }
 
-
+pre {
+	position: absolute;
+	z-index: -1;
+	will-change: transform;
+	transition: 0s linear;
+	transition-property: transform;
+}
