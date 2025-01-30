@@ -51,9 +51,9 @@ h1 {
 }
 
 pre {
-	position: absolute;
-	z-index: -1;
+	position: fixed;
+	pointer-events: none;
 	will-change: transform;
-	transition: 0s linear;
-	transition-property: transform;
+	backface-visibility: hidden;
+	z-index: -1;
 }

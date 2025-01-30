@@ -1,15 +1,21 @@
 function update() {
 	document.getElementById("programming-duration").innerText = String(Math.round((new Date() - new Date("Dec 18, 2014")) / (24 * 60 * 60 * 1000 * 365) * 1e8) / 1e8).padEnd(11, 0);
-	scrollParallax();
+	//scrollParallax();
 	window.requestAnimationFrame(update);
 }
 
-function scrollParallax() {
-	try {
-		let scrolled = window.pageYOffset/2;
-		document.getElementsByTagName("pre")[0].style.transform = `translateY(${scrolled}px)`;
-	} catch (e) {}
+function updateParallax() {
+	let scrollY = window.scrollY;
+	let pres = document.getElementsByTagName("pre");
+	for (let i = 0; i < pres.length; i++) {
+		let scrollC = (Math.sin(i + 1) / 2)
+		let scrollO = 700 + Math.sin(Math.sqrt(2) * (i + 1)) * 500;
+		pres[i].style.transform = `translate3d(0, -${scrollY * scrollC + scrollO}px, 0)`;
+	}
+	requestAnimationFrame(updateParallax);
 }
+
+requestAnimationFrame(updateParallax);
 
 update();
 
@@ -17,15 +23,9 @@ const files = ["index.html", "about.html", "home/script.js", "home/style.css", "
 let filesLoaded = 0;
 let filesContent = [];
 
-files.forEach(f => fetch(f).then(e => e.text().then(i => {filesContent.push(i); filesLoaded++; checkFilesLoaded()})));
-
-function checkFilesLoaded() {
-	if (filesLoaded == files.length) {
-		console.log("loaded!");
-		let p = document.createElement("pre");
-		p.innerHTML = hljs.highlightAuto(filesContent[5]).value;
-		document.getElementById("background").appendChild(p);
-	}
+for (let i = 0; i < code.length*2; i++) {
+	let p = document.createElement("pre");
+	p.innerHTML = hljs.highlightAuto(code[i%code.length].content).value;
+	p.style.left = (i-code.length/2)*window.innerWidth/code.length/2 + "px";
+	document.getElementById("background").appendChild(p);
 }
-
-window.addEventListener("scroll", scrollParallax, { passive: true });
