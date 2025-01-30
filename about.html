@@ -7,11 +7,22 @@
 	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital@0;1&display=swap" rel="stylesheet">
 	<title>About</title>
 	<link rel="stylesheet" href="about/style.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
 <body>
 	<div id="loading-screen">
-		<div class="loader">-</div>
+		<div class="loader" id="loading-text">-</div>
 	</div>
+	<script>
+		const frames = "-/|\\".split("");
+		let i = 0;
+		setInterval(() => {
+			document.getElementById("loading-text").innerText = frames[i++ % frames.length];
+		}, 100);
+	</script>
+
+	<div id="background"></div>
 	<div id="content-wrapper">
 		<div>
 			<h1>About</h1>

@@ -258,7 +258,5 @@ function tickParticles() {
 	}
 }
 
-render();
-refreshBackground();
 animate();
 
