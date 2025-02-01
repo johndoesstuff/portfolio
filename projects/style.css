@@ -3,7 +3,7 @@ body {
 	color: #00006b;
 	font-family: "JetBrains Mono", serif;
 	margin: 0;
-	overflow: hidden;
+	overflow-x: hidden;
 }
 
 #content-wrapper {
@@ -40,4 +40,13 @@ h1 {
 #loading-screen.hidden {
 	opacity: 0;
 	visibility: hidden;
+}
+
+.project img {
+	width: 20%;
+	float: left;
+	margin: 1vw;
+	margin-top: 0;
+	margin-bottom: 0;
+	border: 2.5px solid #00006b;
 }
