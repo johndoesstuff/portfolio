@@ -21,13 +21,17 @@
 			document.getElementById("loading-text").innerText = frames[i++ % frames.length];
 		}, 100);
 	</script>
-	<header>
+	<div id="background"></div>
+	<div id="content-wrapper">
 		<h1>Projects</h1>
-	</header>
-	<main>
 		<p>Projects page</p>
-	</main>
+	</div>
 	<script src="projects/script.js"></script>
+	<script>
+		window.addEventListener("load", function () {
+			document.getElementById("loading-screen").classList.add("hidden");
+		})
+	</script>
 </body>
 </html>
 
