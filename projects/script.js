@@ -1,9 +1,24 @@
 let projects = { //object so its easier to change order if needed
 	0: {
 		img: "projects/placeholder.png",
-		title: "Project Name",
-		description: "Medium length blurb describing what the project does and why it's important. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam consectetur odio erat, in interdum dolor accumsan ut. Sed venenatis vitae felis in semper.",
-	}
+		title: "EBNF Parser Generator",
+		description: "A TypeScript tool that parses EBNF syntax and generates a TypeScript program capable of building an abstract syntax tree (AST) for a given input. It automates the creation of parsers from formal grammar definitions, making it useful for language design, interpreters, and compilers.",
+	},
+	1: {
+		img: "projects/placeholder.png",
+		title: "86x Assembly Raymarcher",
+		description: "A simple raymarching engine written in x86 assembly, designed as a learning exercise in low-level programming. It renders basic 3D scenes using signed distance functions (SDFs) with a focus on minimalism and performance."
+	},
+	2: {
+		img: "projects/placeholder.png",
+		title: "Tiny BASIC Interpreter",
+		description: "A Tiny BASIC interpreter written in JavaScript that reads and executes programs from a file. It supports variables, arithmetic expressions, and basic control flow, demonstrating efficient parsing and execution of a minimal programming language. It follows the specification outlined in Dr. Dobb's Journal Vol. 1, no. 1. p. 9"
+	},
+	3: {
+		img: "projects/placeholder.png",
+		title: "WTE Text Editor",
+		description: "A lightweight text editor built in C, designed for simplicity and performance. It features essential text manipulation tools such as basic editing, saving, and opening files, as well as support for handling user input and text navigation. The editor uses standard console functionality to provide a fast, responsive environment ideal for quick coding sessions and text editing tasks.",
+	},
 }
 
 function makeProject(img, title, description) {
