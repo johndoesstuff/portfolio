@@ -45,7 +45,7 @@ h1 {
 .project img {
 	width: 25%;
 	height: auto;
-	aspect-ratio: 4 / 5;
+	aspect-ratio: 1 / 1;
 	float: left;
 	margin: 1vw;
 	margin-top: 0;
