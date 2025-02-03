@@ -42,6 +42,10 @@ h1 {
 	visibility: hidden;
 }
 
+a {
+	color: inherit;
+}
+
 .project img {
 	width: 25%;
 	height: auto;
