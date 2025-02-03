@@ -46,6 +46,21 @@ a {
 	color: inherit;
 }
 
+#background {
+	position: absolute;
+	width: 100vw;
+	height: 100vh;
+	background: #fffdeb;
+	margin: 0;
+	top: 0;
+	z-index: -1;
+	color: #B9B8C8;
+	text-align: center;
+	display: flex;
+	align-items: center;
+	user-select: none;
+}
+
 .project img {
 	width: 25%;
 	height: auto;
