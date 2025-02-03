@@ -102,7 +102,7 @@ function initializeBackground() {
 initializeBackground();
 
 function refreshBackground() {
-	background.innerText = window.backgroundValues.map(e => e.map(h => (h > 0.5 ? '#' : h > 0.2 ? ':' : '.')).join("")).join("\n");
+	background.innerText = window.backgroundValues.map(e => e.map(h => (h > 0.8 ? '#' : h > 0.5 ? '*' : h > 0.2 ? '-' : '.')).join("")).join("\n");
 }
 
 function addDrop(x, y, amount) {
@@ -132,6 +132,10 @@ function render() {
 	addDrop(~~Math.min(Math.max(mouse.asciiX, 0), window.backgroundArray[0].length), ~~Math.min(Math.max(mouse.asciiY, 0), window.backgroundArray.length), 5);
 	updateFluid()
 	refreshBackground();
+
+	//add random drop
+	addDrop(~~(Math.random() * window.backgroundArray[0].length), ~~(Math.random() * window.backgroundArray.length), Math.random() * 100);
+
 	requestAnimationFrame(render);
 }
 
