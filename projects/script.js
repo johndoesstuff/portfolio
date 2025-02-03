@@ -122,16 +122,33 @@ function updateFluid() {
 				window.backgroundValues[y][x] +
 				window.backgroundValues[myl][x] + window.backgroundValues[myh][x] +
 				window.backgroundValues[y][mxl] + window.backgroundValues[y][mxh]
-			) / 5;
+			) / 5.1;
 		}
 	}
 	[window.backgroundValues, window.backgroundBuffer] = [window.backgroundBuffer, window.backgroundValues];
 }
 
 function render() {
+	addDrop(~~Math.min(Math.max(mouse.asciiX, 0), window.backgroundArray[0].length), ~~Math.min(Math.max(mouse.asciiY, 0), window.backgroundArray.length), 5);
 	updateFluid()
 	refreshBackground();
 	requestAnimationFrame(render);
 }
+
+window.onresize = function() {
+	initializeBackground();
+}
+
+let mouse = { x: 0, y: 0, asciiX: 0, asciiY: 0 };
+
+window.onmousemove = function(e) {
+	mouse.x = e.clientX;
+	mouse.y = e.clientY+window.scrollY;
+
+	mouse.asciiX = mouse.x / window.innerWidth * window.backgroundArray[0].length;
+	mouse.asciiY = mouse.y / document.documentElement.scrollHeight * window.backgroundArray.length;
+}
+
+setTimeout(initializeBackground, 1000); //yes, its scuffed. i dont care
 
 render();
