@@ -57,10 +57,12 @@ createProjects();
 //fluid simulation
 
 window.backgroundArray = null;
+window.backgroundValues = null;
+window.backgroundBuffer = null;
 
 function getBgSize() {
 	let screenWidth = window.innerWidth;
-	let screenHeight = window.innerHeight;
+	let screenHeight = document.documentElement.scrollHeight;
 	let charElement = document.createElement("pre");
 	charElement.innerText = ("M".repeat(100) + "\n").repeat(100);
 	charElement.style.visibility = 'hidden';
@@ -77,7 +79,7 @@ function getBgSize() {
 	const charWidth = charElement.offsetWidth/100;
 	const charHeight = charElement.offsetHeight/100;
 
-	const rows = Math.floor(document.documentElement.scrollHeight / charHeight);
+	const rows = Math.floor(screenHeight / charHeight);
 	const cols = Math.floor(screenWidth / charWidth);
 
 	document.body.removeChild(charElement);
@@ -91,6 +93,8 @@ function initializeBackground() {
 	let row = bgSize.rows;
 
 	window.backgroundArray = JSON.parse(JSON.stringify(Array(row).fill(Array(col).fill("#"))));
+	window.backgroundValues = JSON.parse(JSON.stringify(Array(row).fill(Array(col).fill(0))));
+	window.backgroundBuffer = JSON.parse(JSON.stringify(Array(row).fill(Array(col).fill(0))));
 
 	refreshBackground();
 }
@@ -98,5 +102,36 @@ function initializeBackground() {
 initializeBackground();
 
 function refreshBackground() {
-	background.innerText = window.backgroundArray.map(e => e.join("")).join("\n");
+	background.innerText = window.backgroundValues.map(e => e.map(h => (h > 0.5 ? '#' : h > 0.2 ? ':' : '.')).join("")).join("\n");
 }
+
+function addDrop(x, y, amount) {
+	if (x >= 0 && x < window.backgroundArray[0].length && y >= 0 && y < window.backgroundArray.length) {
+		backgroundValues[y][x] += amount;
+	}
+}
+
+function updateFluid() {
+	for (let y = 0; y < window.backgroundArray.length; y++) {
+		for (let x = 0; x < window.backgroundArray[0].length; x++) {
+			let myh = (1 + y + window.backgroundArray.length) % window.backgroundArray.length;
+			let myl = (-1 + y + window.backgroundArray.length) % window.backgroundArray.length;
+			let mxh = (1 + x + window.backgroundArray[0].length) % window.backgroundArray[0].length;
+			let mxl = (-1 + x + window.backgroundArray[0].length) % window.backgroundArray[0].length;
+			window.backgroundBuffer[y][x] = (
+				window.backgroundValues[y][x] +
+				window.backgroundValues[myl][x] + window.backgroundValues[myh][x] +
+				window.backgroundValues[y][mxl] + window.backgroundValues[y][mxh]
+			) / 5;
+		}
+	}
+	[window.backgroundValues, window.backgroundBuffer] = [window.backgroundBuffer, window.backgroundValues];
+}
+
+function render() {
+	updateFluid()
+	refreshBackground();
+	requestAnimationFrame(render);
+}
+
+render();
