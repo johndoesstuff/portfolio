@@ -30,6 +30,15 @@ h1 {
 	margin-top: 0;
 }
 
+#back-button {
+	position: absolute;
+	top: 1vw;
+	left: 1vw;
+	background: rgba(255, 253, 235, 0.9);
+	padding: 1vw;
+	box-shadow: 0 0 0 2.5px #00006b inset;
+}
+
 #loading-screen {
 	position: fixed;
 	top: 0;

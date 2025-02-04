@@ -6,10 +6,10 @@
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital@0;1&display=swap" rel="stylesheet">
 	<title>About</title>
-	<link rel="stylesheet" href="about/style.css">
+	<link rel="stylesheet" href="style.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-	<script src="about/code.js"></script>
+	<script src="code.js"></script>
 </head>
 <body>
 	<div id="loading-screen">
@@ -22,20 +22,23 @@
 			document.getElementById("loading-text").innerText = frames[i++ % frames.length];
 		}, 100);
 	</script>
-
+	<div id="back-button"><a href="/..">Back</a></div>
 	<div id="background"></div>
 	<div id="content-wrapper">
 		<div>
 			<h1>About</h1>
 		</div>
-		<img id="portrait-1" src="about/portrait_1.png">
+		<img id="portrait-1" src="portrait_1.png">
 		<div>
 			<span>Hi! I am John, a current sophomore at George Mason University pursuing a bachelors in Computer Science. With </span>
 			<span id="programming-duration"></span>
 			<span> years of programming experience, I have developed a deep passion for problem-solving, performance optimization, and building innovative solutions from the ground up. My expertise spans many ranges, including Javascript, C, Java, Assembly, Linux, among others. Beyond software development, I also have experience in video editing, graphic design, photography, 3d modeling, using power tools, and more of which I've cultivated through various projects. Whether it's low-level systems programming, graphics rendering, or full-stack development, I'm always up for a challenge.</span>
 			<br>
+			<br>
 			<span>I have a YouTube channel (which I'm pretty proud of!) where I showcase my tech projects, creative work, and experiments. You can find my social media links below!</span>
 			<br>
+			<br>
+			<a href="https://www.youtube.com/@JohnDoesStuffLol">Youtube</a>&nbsp<a href="https://github.com/johndoesstuff">Github</a>
 			<h3>Technical Skills</h3>
 			<span>Languages: C, JavaScript, Java, Assembly, TypeScript, Python, C++, HTML, CSS, EBNF, APL, Uiua</span>
 			<br>
@@ -47,7 +50,7 @@
 			<span>Outside of programming, I have experience in robotics, engineering, and hands-on hardware projects. I enjoy blending software and hardware to create innovative solutions and constantly seek new ways to refine my skills and explore emerging technologies.</span>
 		</div>
 	</div>
-	<script src="about/script.js"></script>
+	<script src="script.js"></script>
 	<script>
 		window.addEventListener("load", function () {
 			document.getElementById("loading-screen").classList.add("hidden");
