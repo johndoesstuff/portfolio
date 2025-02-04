@@ -19,6 +19,13 @@ body {
 	box-shadow: 0 0 0 2.5px #00006b inset;
 }
 
+@media (orientation: portrait) {
+	#content-wrapper {
+		margin-left: 10vw;
+		margin-right: 10vw;
+	}
+}
+
 h1 {
 	margin-top: 0;
 }
