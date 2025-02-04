@@ -1,6 +1,6 @@
 # Portfolio
 
-## Hosted at [www.john-best.com](www.john-best.com)
+## Hosted at [www.john-best.com](http://john-best.com)
 
 ![Portfolio](portfolio.png)
 
