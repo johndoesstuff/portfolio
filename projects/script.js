@@ -5,19 +5,25 @@ let projects = { //object so its easier to change order if needed
 		description: "A TypeScript tool that parses EBNF syntax and generates a TypeScript program capable of building an abstract syntax tree (AST) for a given input. It automates the creation of parsers from formal grammar definitions, making it useful for language design, interpreters, and compilers.",
 		link: "https://github.com/johndoesstuff/ebnf-parser",
 	},
+	2: {
+		img: "portfolio.png",
+		title: "Portfolio Website",
+		description: "john-best.com is my personal portfolio showcasing my programming projects, technical skills, and experience in software development. I've tried to include various showcases of my skill in the backgrounds throughout this website, (try moving your mouse on the background of this page!).",
+		link: "https://github.com/johndoesstuff/portfolio",
+	},
 	1: {
 		img: "x86raymarcher.png",
 		title: "86x Assembly Raymarcher",
 		description: "A simple raymarching engine written in x86 assembly, designed as a learning exercise in low-level programming. It renders basic 3D scenes using signed distance functions (SDFs) with a focus on minimalism and performance.",
 		link: "https://github.com/johndoesstuff/asmRaymarcher",
 	},
-	2: {
+	3: {
 		img: "bas.png",
 		title: "Tiny BASIC Interpreter",
 		description: "A Tiny BASIC interpreter written in JavaScript that reads and executes programs from a file. It supports variables, arithmetic expressions, and basic control flow, demonstrating efficient parsing and execution of a minimal programming language. It follows the specification outlined in Dr. Dobb's Journal Vol. 1, no. 1. p. 9",
 		link: "https://github.com/johndoesstuff/tinyBasicInterpreter",
 	},
-	3: {
+	4: {
 		img: "wte.png",
 		title: "WTE Text Editor",
 		description: "A lightweight text editor built in C, designed for simplicity and performance. It features essential text manipulation tools such as basic editing, saving, and opening files, as well as support for handling user input and text navigation. The editor uses standard console functionality to provide a fast, responsive environment ideal for quick coding sessions and text editing",

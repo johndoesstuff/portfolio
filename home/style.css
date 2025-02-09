@@ -14,10 +14,14 @@ pre {
 	text-align: center;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4 {
 	text-align: center;
 	margin-left: 5vw;
 	margin-right: 5vw;
+}
+
+#contact {
+	text-align: center;
 }
 
 #loading-screen {
