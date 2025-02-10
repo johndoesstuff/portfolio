@@ -18,16 +18,34 @@ let projects = { //object so its easier to change order if needed
 		link: "https://github.com/johndoesstuff/asmRaymarcher",
 	},
 	3: {
+		img: "craymarcher.png",
+		title: "C Raymarcher",
+		description: "A real-time raymarching renderer written in C that runs directly in the terminal using ANSI escape codes for visual output. It simulates 3D scenes and calculates lighting and shadows dynamically. It also has smooth camera motion and a procedural lighting system. Optimized for performance, it updates the terminal display using a custom framebuffer in a purely text-based environment.",
+		link: "https://github.com/johndoesstuff/cRaymarcher",
+	},
+	4: {
 		img: "bas.png",
 		title: "Tiny BASIC Interpreter",
 		description: "A Tiny BASIC interpreter written in JavaScript that reads and executes programs from a file. It supports variables, arithmetic expressions, and basic control flow, demonstrating efficient parsing and execution of a minimal programming language. It follows the specification outlined in Dr. Dobb's Journal Vol. 1, no. 1. p. 9",
 		link: "https://github.com/johndoesstuff/tinyBasicInterpreter",
 	},
-	4: {
+	5: {
 		img: "wte.png",
 		title: "WTE Text Editor",
 		description: "A lightweight text editor built in C, designed for simplicity and performance. It features essential text manipulation tools such as basic editing, saving, and opening files, as well as support for handling user input and text navigation. The editor uses standard console functionality to provide a fast, responsive environment ideal for quick coding sessions and text editing",
 		link: "https://github.com/johndoesstuff/WTE-Text-Editor",
+	},
+	6: {
+		img: "tesseract.png",
+		title: "Hypercube Wireframe Renderer",
+		description: "This program is a real-time terminal-based renderer that visualizes an N-dimensional hypercube as a wireframe projection onto a 2D plane. It achieves this by iteratively rotating the hypercube through multiple dimensions and projecting it onto the screen using a perspective transformation. Also supporting arbitrary dimensions, it smoothly rotates the hypercube across every plane of rotation in the dimension space.",
+		link: "https://github.com/johndoesstuff/hypercube-wireframe",
+	},
+	7: {
+		img: "dsl.png",
+		title: "DSL Tracker",
+		description: "A lightweight C program that tracks the time since specified events. It allows users to add, remove, update, and clear events, storing them in a simple text file. The program continuously updates and displays the elapsed time for each event in real-time, formatted as years, days, hours, minutes, or seconds.",
+		link: "https://github.com/johndoesstuff/dsl",
 	},
 }
 
