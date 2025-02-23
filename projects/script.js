@@ -27,7 +27,7 @@ let projects = { //object so its easier to change order if needed
 		img: "textgore.png",
 		title: "TextGore",
 		description: "This project was more made for fun because I love unicode and wanted to learn react. It's a simple web app that allows you to destroy and distort text based on various sliders and parameters. A useful utility if like me you enjoy making text more strange.",
-		link: "https://github.com/johndoesstuff/cRaymarcher",
+		link: "https://github.com/johndoesstuff/textgore",
 	},
 	5: {
 		img: "bas.png",
