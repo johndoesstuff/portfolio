@@ -53,6 +53,12 @@ let projects = { //object so its easier to change order if needed
 		description: "A lightweight C program that tracks the time since specified events. It allows users to add, remove, update, and clear events, storing them in a simple text file. The program continuously updates and displays the elapsed time for each event in real-time, formatted as years, days, hours, minutes, or seconds.",
 		link: "https://github.com/johndoesstuff/dsl",
 	},
+	9: {
+		img: "timeline.png",
+		title: "Timeline Maker",
+		description: "I wasn't able to find any program online that was able to make very simple timelines for comparing how long different periods of time were so I decided to hand code my own. This tools allows you to enter date ranges with titles and automatically adjusts and sorts the display for comparing different lengths of time.",
+		link: "https://github.com/johndoesstuff/timelineMaker",
+	}
 }
 
 function makeProject(img, title, description, link) {
