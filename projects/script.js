@@ -1,5 +1,11 @@
 let projects = [
 	{
+		img: "unibl.png",
+		title: "UNIBL Assembler & Virtual Machine",
+		description: "In an attempt to make a universal bootstrappable computational architecture I designed the UNIBL Assembler including a preprocessor and directives along with an assembler and virtual machine with a self defining standard library to initialize macros and stack calls. All of this was made using Bison, Yacc, and ANSI C.",
+		link: "https://github.com/johndoesstuff/uniblvm",
+	},
+	{
 		img: "mincc.png",
 		title: "MinCC C Compiler",
 		description: "Tokenizes, parses, and compiles a subset of the C language to LLVM IR implementing lexical analysis, recursive descent parsing, type checking, and semantic analysis to support variable declarations, control flow, expressions, and function definitions (and much more, check out the project page!). Pictured is a screenshot of it compiling and running a simple raymarching program I wrote in C.",
