@@ -1,3 +1,5 @@
+import initWasm from "/assets/c/build/fluid.js";
+
 let projects = [
 	{
 		img: "unibl.png",
@@ -89,7 +91,7 @@ function makeProject(img, title, description, link) {
 	let divElem = document.createElement("div");
 	divElem.classList.add("project");
 	let imgElem = document.createElement("img");
-	imgElem.src = img;
+	imgElem.src = "/assets/images/" + img;
 	let titleElem = document.createElement("h2");
 	let titleLink = document.createElement("a");
 	titleLink.innerText = title;
@@ -105,7 +107,7 @@ function makeProject(img, title, description, link) {
 
 function createProjects() {
 	let projectCount = projects.length;
-	for (let = 0; i < projectCount; i++) {
+	for (let i = 0; i < projectCount; i++) {
 		let project = projects[i];
 		document.getElementById("projects").appendChild(makeProject(project.img, project.title, project.description, project.link));
 	}
@@ -113,14 +115,82 @@ function createProjects() {
 
 createProjects();
 
-
 //fluid simulation
+let wasm;
+let rows, cols, valuesPtr;
+let mouse = { x: 0, y: 0, asciiX: 0, asciiY: 0 };
+const backgroundElem = document.getElementById("background");
 
-window.backgroundArray = null;
-window.backgroundValues = null;
-window.backgroundBuffer = null;
+async function loadFluid(rowsInit, colsInit) {
+    wasm = await initWasm();  // initialize WASM
 
-function getBgSize() {
+    wasm._init(rowsInit, colsInit);
+
+    rows = wasm._get_rows();
+    cols = wasm._get_cols();
+
+    valuesPtr = wasm._get_values();
+}
+
+// safe wrapper
+function addDropSafe(x, y, amt) {
+    if (!wasm) return;  // ignore until WASM is ready
+    wasm._add_drop(x, y, amt);
+}
+
+function updateFluid() {
+    if (!wasm) return new Float32Array(); // still initializing
+    wasm._update();
+    return new Float32Array(wasm.HEAPF32.buffer, valuesPtr, rows * cols);
+}
+
+// render loop
+function renderFrame() {
+    addDropSafe(mouse.asciiX, mouse.asciiY, 5);
+	addDropSafe(~~(Math.random() * cols), ~~(Math.random() * rows), Math.random() * 100);
+    const mem = updateFluid();
+    if (mem.length === 0) {
+        requestAnimationFrame(renderFrame);
+        return;
+    }
+
+    let output = "";
+    for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+            const val = mem[y * cols + x];
+            if (val > 0.8) output += "#";
+            else if (val > 0.5) output += "*";
+            else if (val > 0.2) output += "-";
+            else output += ".";
+        }
+        output += "\n";
+    }
+    backgroundElem.textContent = output;
+
+    requestAnimationFrame(renderFrame);
+}
+
+// mouse handling
+window.onmousemove = function(e) {
+	mouse.x = e.clientX;
+	mouse.y = e.clientY+window.scrollY;
+
+	mouse.asciiX = mouse.x / window.innerWidth * cols;
+	mouse.asciiY = mouse.y / document.documentElement.scrollHeight * rows;
+}
+
+window.onresize = async function() {
+	start();
+}
+
+// start simulation
+async function start() {
+    const screenSize = getScreenSize();
+    await loadFluid(screenSize.rows, screenSize.cols);
+    renderFrame();
+}
+
+function getScreenSize() {
 	let screenWidth = window.innerWidth;
 	let screenHeight = document.documentElement.scrollHeight;
 	let charElement = document.createElement("pre");
@@ -147,72 +217,5 @@ function getBgSize() {
 	return { cols, rows };
 }
 
-function initializeBackground() {
-	let bgSize = getBgSize();
-	let col = bgSize.cols;
-	let row = bgSize.rows;
+start();
 
-	window.backgroundArray = JSON.parse(JSON.stringify(Array(row).fill(Array(col).fill("#"))));
-	window.backgroundValues = JSON.parse(JSON.stringify(Array(row).fill(Array(col).fill(0))));
-	window.backgroundBuffer = JSON.parse(JSON.stringify(Array(row).fill(Array(col).fill(0))));
-
-	refreshBackground();
-}
-
-initializeBackground();
-
-function refreshBackground() {
-	background.innerText = window.backgroundValues.map(e => e.map(h => (h > 0.8 ? '#' : h > 0.5 ? '*' : h > 0.2 ? '-' : '.')).join("")).join("\n");
-}
-
-function addDrop(x, y, amount) {
-	if (x >= 0 && x < window.backgroundArray[0].length && y >= 0 && y < window.backgroundArray.length) {
-		backgroundValues[y][x] += amount;
-	}
-}
-
-function updateFluid() {
-	for (let y = 0; y < window.backgroundArray.length; y++) {
-		for (let x = 0; x < window.backgroundArray[0].length; x++) {
-			let myh = (1 + y + window.backgroundArray.length) % window.backgroundArray.length;
-			let myl = (-1 + y + window.backgroundArray.length) % window.backgroundArray.length;
-			let mxh = (1 + x + window.backgroundArray[0].length) % window.backgroundArray[0].length;
-			let mxl = (-1 + x + window.backgroundArray[0].length) % window.backgroundArray[0].length;
-			window.backgroundBuffer[y][x] = (
-				window.backgroundValues[y][x] +
-				window.backgroundValues[myl][x] + window.backgroundValues[myh][x] +
-				window.backgroundValues[y][mxl] + window.backgroundValues[y][mxh]
-			) / 5.1;
-		}
-	}
-	[window.backgroundValues, window.backgroundBuffer] = [window.backgroundBuffer, window.backgroundValues];
-}
-
-function render() {
-	addDrop(~~Math.min(Math.max(mouse.asciiX, 0), window.backgroundArray[0].length), ~~Math.min(Math.max(mouse.asciiY, 0), window.backgroundArray.length), 5);
-	updateFluid()
-	refreshBackground();
-
-	//add random drop
-	addDrop(~~(Math.random() * window.backgroundArray[0].length), ~~(Math.random() * window.backgroundArray.length), Math.random() * 100);
-
-	requestAnimationFrame(render);
-}
-
-window.onresize = function() {
-	initializeBackground();
-}
-
-let mouse = { x: 0, y: 0, asciiX: 0, asciiY: 0 };
-
-window.onmousemove = function(e) {
-	mouse.x = e.clientX;
-	mouse.y = e.clientY+window.scrollY;
-
-	mouse.asciiX = mouse.x / window.innerWidth * window.backgroundArray[0].length;
-	mouse.asciiY = mouse.y / document.documentElement.scrollHeight * window.backgroundArray.length;
-}
-
-setTimeout(initializeBackground, 1000); //yes, its scuffed. i dont care
-
-render();
