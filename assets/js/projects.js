@@ -173,10 +173,10 @@ function renderFrame() {
 // mouse handling
 window.onmousemove = function(e) {
 	mouse.x = e.clientX;
-	mouse.y = e.clientY+window.scrollY;
+	mouse.y = e.clientY;
 
 	mouse.asciiX = mouse.x / window.innerWidth * cols;
-	mouse.asciiY = mouse.y / document.documentElement.scrollHeight * rows;
+	mouse.asciiY = mouse.y / window.innerHeight * rows;
 }
 
 window.onresize = async function() {
@@ -192,7 +192,7 @@ async function start() {
 
 function getScreenSize() {
 	let screenWidth = window.innerWidth;
-	let screenHeight = document.documentElement.scrollHeight;
+	let screenHeight = window.innerHeight;
 	let charElement = document.createElement("pre");
 	charElement.innerText = ("M".repeat(100) + "\n").repeat(100);
 	charElement.style.visibility = 'hidden';
