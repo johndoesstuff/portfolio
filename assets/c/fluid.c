@@ -2,11 +2,15 @@
 #include <stdlib.h>
 
 static int ROWS, COLS;
-static float *values;
-static float *buffer;
+static float* values;
+static float* buffer;
 
-int get_rows() { return ROWS; }
-int get_cols() { return COLS; }
+int get_rows() {
+    return ROWS;
+}
+int get_cols() {
+    return COLS;
+}
 
 void init(int rows, int cols) {
     ROWS = rows;
@@ -22,7 +26,8 @@ void init(int rows, int cols) {
 }
 
 void add_drop(int x, int y, float amt) {
-    if (x < 0 || x >= COLS || y < 0 || y >= ROWS) return;
+    if (x < 0 || x >= COLS || y < 0 || y >= ROWS)
+        return;
     values[y * COLS + x] += amt;
 }
 
@@ -35,20 +40,18 @@ void update() {
             int mxh = (x + 1) % COLS;
             int mxl = (x - 1 + COLS) % COLS;
 
-            float v =
-                values[y  * COLS + x] +
-                values[myl* COLS + x] +
-                values[myh* COLS + x] +
-                values[y  * COLS + mxl] +
-                values[y  * COLS + mxh];
+            float v = values[y * COLS + x] + values[myl * COLS + x] + values[myh * COLS + x] + values[y * COLS + mxl] +
+                      values[y * COLS + mxh];
 
             buffer[y * COLS + x] = v / 5.1f;
         }
     }
 
-    float *tmp = values;
+    float* tmp = values;
     values = buffer;
     buffer = tmp;
 }
 
-float *get_values() { return values; }
+float* get_values() {
+    return values;
+}
