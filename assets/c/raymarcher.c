@@ -6,8 +6,16 @@
 #define MAX_STEPS 40
 #define MAX_DIST 25.0f  // == maxDist in render(); a hit past it shades to ' ' anyway
 #define EPSILON 0.001f
-#define WRAP 4.0f   // period of the sphere lattice
+#define WRAP 4.0f   // period of the lattice
 #define FOCAL 1.5f  // focal length / FOV
+
+#define NORMAL_H 0.01f  // finite-difference step for the surface normal
+#define AMBIENT 0.28f   // floor brightness, so faces turned away still read
+#define EXPOSURE                                                                                                       \
+    1.15f  // fog and lighting are both attenuations and compound;
+           // this wins the top of the ramp back. tuned by
+           // histogramming the ramp until every rung got used
+#define SHAPES 4
 
 // ASCII shades
 // const char shadings[] = " .,-+=%#";
@@ -24,6 +32,10 @@ typedef struct {
 } Vec3;
 Vec3 cameraPos = {0, 0, -6};
 Vec3 cameraDir = {0, 0, 0};
+
+// fixed world-space direction the light arrives from, pre-normalised. it leans
+// back towards the camera (-z) so the faces we can see are the lit ones
+const Vec3 LIGHT = {-0.396f, 0.693f, -0.601f};
 
 // utility functions
 Vec3 normalize(Vec3 v) {
@@ -46,12 +58,59 @@ static inline float repeat(float v) {
     return v - WRAP * floorf(v / WRAP + 0.5f);
 }
 
-// repeated wrapped sphere of radius 1, centred in every lattice cell
+// the primitive sitting in every lattice cell, chosen once per page load.
+// each is a proper distance bound (never overestimates), which is what lets
+// the marcher step by the returned value without tunnelling through a surface
+int shape = 0;
+
+static inline float sdSphere(Vec3 p) {
+    return sqrtf(p.x * p.x + p.y * p.y + p.z * p.z) - 1.0f;
+}
+
+static inline float sdRoundBox(Vec3 p) {
+    const float b = 0.72f, r = 0.22f;
+    float qx = fabsf(p.x) - b, qy = fabsf(p.y) - b, qz = fabsf(p.z) - b;
+    float ox = fmaxf(qx, 0.0f), oy = fmaxf(qy, 0.0f), oz = fmaxf(qz, 0.0f);
+    float inside = fminf(fmaxf(qx, fmaxf(qy, qz)), 0.0f);
+    return sqrtf(ox * ox + oy * oy + oz * oz) + inside - r;
+}
+
+static inline float sdTorus(Vec3 p) {
+    const float R = 0.85f, r = 0.34f;
+    float q = sqrtf(p.x * p.x + p.z * p.z) - R;
+    return sqrtf(q * q + p.y * p.y) - r;
+}
+
+static inline float sdOctahedron(Vec3 p) {
+    const float s = 1.35f;
+    // the cheap bound rather than the exact form: still Lipschitz-1, no branches
+    return (fabsf(p.x) + fabsf(p.y) + fabsf(p.z) - s) * 0.57735027f;
+}
+
+// the chosen primitive, repeated through every cell of the lattice
 float SDF(Vec3 point) {
-    float x = repeat(point.x);
-    float y = repeat(point.y);
-    float z = repeat(point.z);
-    return sqrtf(x * x + y * y + z * z) - 1.0f;
+    Vec3 p = {repeat(point.x), repeat(point.y), repeat(point.z)};
+    switch (shape) {
+    case 1:
+        return sdRoundBox(p);
+    case 2:
+        return sdTorus(p);
+    case 3:
+        return sdOctahedron(p);
+    default:
+        return sdSphere(p);
+    }
+}
+
+// surface normal by central differences, tetrahedron variant -- 4 SDF probes
+// rather than the 6 an axis-aligned difference would need
+Vec3 normalAt(Vec3 p) {
+    const float h = NORMAL_H;
+    float a = SDF((Vec3){p.x + h, p.y - h, p.z - h});
+    float b = SDF((Vec3){p.x - h, p.y - h, p.z + h});
+    float c = SDF((Vec3){p.x - h, p.y + h, p.z - h});
+    float d = SDF((Vec3){p.x + h, p.y + h, p.z + h});
+    return normalize((Vec3){a - b - c + d, -a - b + c + d, -a + b - c + d});
 }
 
 // raymarch
@@ -137,7 +196,18 @@ void render() {
                 // smoothstep: 3t² – 2t³
                 t = t * t * (3.0f - 2.0f * t);
 
-                int idx = (int)((1.0f - t) * (shades - 1));
+                // half-lambert rather than plain max(dot, 0): it wraps the
+                // falloff around the terminator, which the 11-step ramp reads
+                // far better than a hard black hemisphere
+                Vec3 n = normalAt(hit);
+                float lambert = 0.5f + 0.5f * dot(n, LIGHT);
+                float shade = (1.0f - t) * (AMBIENT + (1.0f - AMBIENT) * lambert) * EXPOSURE;
+
+                int idx = (int)(shade * (shades - 1) + 0.5f);
+                if (idx < 0)
+                    idx = 0;
+                if (idx > shades - 1)
+                    idx = shades - 1;
                 row[x] = shadings[idx];
             } else {
                 row[x] = ' ';
@@ -157,6 +227,21 @@ void init(int w, int h, char* buffer) {
 }
 EMSCRIPTEN_KEEPALIVE
 void update(double time) {
+    // init() runs again on every resize, so the shape is chosen here instead:
+    // first frame only, seeded from the clock, and stable for the session
+    static int chosen = 0;
+    if (!chosen) {
+        // time is Date.now(), ~1.8e12 -- casting that straight to unsigned is
+        // out of range and undefined, and in wasm it saturates to UINT_MAX,
+        // which would hand every visitor the same shape. fold it in first
+        unsigned int h = (unsigned int)fmod(time, 4294967296.0);
+        h ^= h >> 16;
+        h *= 0x7feb352d;
+        h ^= h >> 15;
+        shape = h % SHAPES;
+        chosen = 1;
+    }
+
     // the lattice repeats every WRAP and the angles every turn, so folding both
     // keeps the floats small no matter how long the page has been open
     cameraPos.x = fmod(sqrt(2) * time / 20000.0, WRAP);
