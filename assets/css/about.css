@@ -66,10 +66,16 @@ h1 {
 	visibility: hidden;
 }
 
-pre {
+#background {
 	position: fixed;
-	pointer-events: none;
-	will-change: transform;
-	backface-visibility: hidden;
+	width: 100vw;
+	height: 100vh;
+	background: #fffdeb;
+	margin: 0;
+	top: 0;
 	z-index: -1;
+	color: #B9B8C8;
+	text-align: center;
+	display: flex;
+	user-select: none;
 }

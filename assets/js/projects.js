@@ -131,88 +131,23 @@ function createProjects() {
 
 createProjects();
 
-// fluid simulation
+// Navier-Stokes fluid simulation, see assets/c/fluid.c. The WASM side writes the
+// finished frame out as newline terminated rows, so rendering is one decode and
+// one assignment rather than concatenating a string a character at a time.
+
 let wasm;
-let rows, cols, valuesPtr;
-let mouse = {x : 0, y : 0, asciiX : 0, asciiY : 0};
+let bufferPtr, bufferLen;
+let gridRows = 0, gridCols = 0;
+
+const decoder = new TextDecoder();
 const backgroundElem = document.getElementById("background");
-
-async function loadFluid(rowsInit, colsInit) {
-    wasm = await initWasm();  // initialize WASM
-
-    wasm._init(rowsInit, colsInit);
-
-    rows = wasm._get_rows();
-    cols = wasm._get_cols();
-
-    valuesPtr = wasm._get_values();
-}
-
-// safe wrapper
-function addDropSafe(x, y, amt) {
-    if (!wasm)
-        return;  // ignore until WASM is ready
-    wasm._add_drop(x, y, amt);
-}
-
-function updateFluid() {
-    if (!wasm)
-        return new Float32Array();  // still initializing
-    wasm._update();
-    return new Float32Array(wasm.HEAPF32.buffer, valuesPtr, rows * cols);
-}
-
-// render loop
-function renderFrame() {
-    addDropSafe(mouse.asciiX, mouse.asciiY, 5);
-    addDropSafe(~~(Math.random() * cols), ~~(Math.random() * rows), Math.random() * 100);
-    const mem = updateFluid();
-    if (mem.length === 0) {
-        requestAnimationFrame(renderFrame);
-        return;
-    }
-
-    let output = "";
-    for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-            const val = mem[y * cols + x];
-            if (val > 0.8)
-                output += "#";
-            else if (val > 0.5)
-                output += "*";
-            else if (val > 0.2)
-                output += "-";
-            else
-                output += ".";
-        }
-        output += "\n";
-    }
-    backgroundElem.textContent = output;
-
-    requestAnimationFrame(renderFrame);
-}
-
-// mouse handling
-window.onmousemove =
-    function(e) {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-
-    mouse.asciiX = mouse.x / window.innerWidth * cols;
-    mouse.asciiY = mouse.y / window.innerHeight * rows;
-}
-
-    window.onresize =
-        async function() {
-    start();
-}
-
-// start simulation
-async function start() {
-    const screenSize = getScreenSize();
-    await loadFluid(screenSize.rows, screenSize.cols);
-    renderFrame();
-}
+const mouse = {
+    x : 0,
+    y : 0,
+    dx : 0,
+    dy : 0,
+    active : false
+};
 
 function getScreenSize() {
     let screenWidth = window.innerWidth;
@@ -241,4 +176,67 @@ function getScreenSize() {
     return {cols, rows};
 }
 
-start();
+function resize() {
+    if (!wasm)
+        return;
+
+    const size = getScreenSize();
+
+    // a resize event that did not actually change the character grid must not
+    // reach _init, which would throw away the simulation and restart it empty
+    if (size.rows === gridRows && size.cols === gridCols)
+        return;
+
+    gridRows = size.rows;
+    gridCols = size.cols;
+
+    wasm._init(size.rows, size.cols, Date.now() >>> 0);
+
+    bufferPtr = wasm._get_buffer();
+    bufferLen = wasm._get_rows() * (wasm._get_cols() + 1) - 1;  // drop the trailing newline
+}
+
+function renderFrame() {
+    if (wasm) {
+        // applied every frame rather than on movement, so a parked cursor keeps
+        // feeding smoke into the flow instead of leaving it to drift away
+        if (mouse.active) {
+            const cols = wasm._get_cols();
+            const rows = wasm._get_rows();
+
+            wasm._add_force(mouse.x / window.innerWidth * cols, mouse.y / window.innerHeight * rows,
+                            mouse.dx / window.innerWidth * cols, mouse.dy / window.innerHeight * rows);
+
+            // momentum comes from the movement since the last frame, so spend it
+            mouse.dx = 0;
+            mouse.dy = 0;
+        }
+
+        wasm._update();
+        backgroundElem.textContent = decoder.decode(wasm.HEAPU8.subarray(bufferPtr, bufferPtr + bufferLen));
+    }
+
+    requestAnimationFrame(renderFrame);
+}
+
+// the cursor drags the fluid: smoke where it is, momentum from how it moved
+window.onmousemove =
+    function(e) {
+    if (mouse.active) {
+        mouse.dx += e.clientX - mouse.x;
+        mouse.dy += e.clientY - mouse.y;
+    }
+
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    mouse.active = true;
+}
+
+    window.onresize = resize;
+
+initWasm().then(module => {
+    wasm = module;
+    resize();
+});
+
+renderFrame();

@@ -5,12 +5,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital@0;1&display=swap" rel="stylesheet">
 	<title>About</title>
 	<link rel="stylesheet" href="/assets/css/about.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-	<script src="/assets/js/about_code.js"></script>
 </head>
 <body>
 	<div id="loading-screen">
@@ -24,7 +23,7 @@
 		}, 100);
 	</script>
 	<div id="back-button"><a href="/..">Back</a></div>
-	<div id="background"></div>
+	<pre id="background"></pre>
 	<div id="content-wrapper">
 		<div>
 			<h1>About</h1>
@@ -52,6 +51,7 @@
 		</div>
 	</div>
 	<script src="/assets/js/about.js"></script>
+	<script type="module" src="/assets/js/about_background.js"></script>
 	<script>
 		window.addEventListener("load", function () {
 			document.getElementById("loading-screen").classList.add("hidden");
