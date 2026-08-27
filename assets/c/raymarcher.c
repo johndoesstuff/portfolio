@@ -4,8 +4,10 @@
 #include <stdlib.h>
 
 #define MAX_STEPS 40
-#define MAX_DIST 30
-#define EPSILON 0.001
+#define MAX_DIST 25.0f  // == maxDist in render(); a hit past it shades to ' ' anyway
+#define EPSILON 0.001f
+#define WRAP 4.0f   // period of the sphere lattice
+#define FOCAL 1.5f  // focal length / FOV
 
 // ASCII shades
 // const char shadings[] = " .,-+=%#";
@@ -18,18 +20,18 @@ int width, height;
 
 // camera
 typedef struct {
-    double x, y, z;
+    float x, y, z;
 } Vec3;
 Vec3 cameraPos = {0, 0, -6};
 Vec3 cameraDir = {0, 0, 0};
 
 // utility functions
 Vec3 normalize(Vec3 v) {
-    double len = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+    float len = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
     return (Vec3){v.x / len, v.y / len, v.z / len};
 }
 
-double dot(Vec3 a, Vec3 b) {
+float dot(Vec3 a, Vec3 b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
@@ -37,59 +39,57 @@ Vec3 subtract(Vec3 a, Vec3 b) {
     return (Vec3){a.x - b.x, a.y - b.y, a.z - b.z};
 }
 
-// SDF for a single sphere
-double sphereSDF(Vec3 point, Vec3 center, double radius) {
-    Vec3 d = subtract(point, center);
-    return sqrt(d.x * d.x + d.y * d.y + d.z * d.z) - radius;
+// fold a coordinate onto the nearest lattice cell, giving [-WRAP/2, WRAP/2).
+// identical to the old fmod(fmod(v, w) + w, w) dance, but floorf is a single
+// wasm instruction where fmod is a libm call -- and this runs 3x per march step
+static inline float repeat(float v) {
+    return v - WRAP * floorf(v / WRAP + 0.5f);
 }
 
-// repeated wrapped sphere
-double SDF(Vec3 point) {
-    point = subtract(point, (Vec3){-2, -2, -2});
-    double wrap = 4;
-    point.x = fmod(fmod(point.x, wrap) + wrap, wrap);
-    point.y = fmod(fmod(point.y, wrap) + wrap, wrap);
-    point.z = fmod(fmod(point.z, wrap) + wrap, wrap);
-    point = subtract(point, (Vec3){2, 2, 2});
-    return sphereSDF(point, (Vec3){0, 0, 0}, 1);
+// repeated wrapped sphere of radius 1, centred in every lattice cell
+float SDF(Vec3 point) {
+    float x = repeat(point.x);
+    float y = repeat(point.y);
+    float z = repeat(point.z);
+    return sqrtf(x * x + y * y + z * z) - 1.0f;
 }
 
 // raymarch
-int raymarch(Vec3 rayOrigin, Vec3 rayDir, Vec3* hitPoint, double* totalDist) {
-    double t = 0;
+int raymarch(Vec3 rayOrigin, Vec3 rayDir, Vec3* hitPoint, float* totalDist) {
+    float t = 0;
     for (int i = 0; i < MAX_STEPS; i++) {
+        if (t > MAX_DIST)
+            return 0;
         Vec3 point = {rayOrigin.x + rayDir.x * t, rayOrigin.y + rayDir.y * t, rayOrigin.z + rayDir.z * t};
-        double dist = SDF(point);
+        float dist = SDF(point);
         if (dist < EPSILON) {
             *hitPoint = point;
             *totalDist = t;
             return 1;
         }
-        if (t > MAX_DIST)
-            return 0;
         t += dist;
     }
     return 0;
 }
 
 // rotation (x -> z -> y)
-Vec3 rotate(Vec3 v, double rx, double ry, double rz) {
-    double cx = cos(rx), sx = sin(rx);
-    double cy = cos(ry), sy = sin(ry);
-    double cz = cos(rz), sz = sin(rz);
+Vec3 rotate(Vec3 v, float rx, float ry, float rz) {
+    float cx = cosf(rx), sx = sinf(rx);
+    float cy = cosf(ry), sy = sinf(ry);
+    float cz = cosf(rz), sz = sinf(rz);
 
     // Apply Y (yaw) first
-    double x = v.x * cy + v.z * sy;
-    double z = -v.x * sy + v.z * cy;
-    double y = v.y;
+    float x = v.x * cy + v.z * sy;
+    float z = -v.x * sy + v.z * cy;
+    float y = v.y;
 
     // Then X (pitch)
-    double ty = y * cx - z * sx;
+    float ty = y * cx - z * sx;
     z = y * sx + z * cx;
     y = ty;
 
     // Then Z (roll)
-    double tx = x * cz - y * sz;
+    float tx = x * cz - y * sz;
     y = x * sz + y * cz;
     x = tx;
 
@@ -98,38 +98,49 @@ Vec3 rotate(Vec3 v, double rx, double ry, double rz) {
 
 // main render
 void render() {
-    double aspectRatio = (double)width / (double)height;
+    float aspectRatio = (float)width / (float)height;
+    const int shades = sizeof(shadings) - 1;
+
+    // rotate() only depends on the camera angles, so instead of calling it (and
+    // its six trig calls) once per pixel, rotate the three basis vectors once
+    // and build each ray as a linear combination of them -- rotation is linear,
+    // so this is exactly the old rayDir
+    Vec3 right = rotate((Vec3){1, 0, 0}, cameraDir.x, cameraDir.y, cameraDir.z);
+    Vec3 up = rotate((Vec3){0, 1, 0}, cameraDir.x, cameraDir.y, cameraDir.z);
+    Vec3 forward = rotate((Vec3){0, 0, 1}, cameraDir.x, cameraDir.y, cameraDir.z);
 
     for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            double nX = (double)x / width * 2.0 - 1.0;
-            double nY = 1.0 - (double)y / height * 2.0;
+        float nY = 1.0f - (float)y / height * 2.0f;
+        char* row = backgroundArray + y * width;
 
-            Vec3 rayDir = (Vec3){nX * aspectRatio, nY, 1.5};  // 1.5 = focal length / FOV
-            rayDir = rotate(rayDir, cameraDir.x, cameraDir.y, cameraDir.z);
-            rayDir = normalize(rayDir);  // now normalize AFTER rotation
+        for (int x = 0; x < width; x++) {
+            float nX = ((float)x / width * 2.0f - 1.0f) * aspectRatio;
+
+            // the basis is orthonormal, so the ray's length is known without
+            // touching the rotated components
+            float inv = 1.0f / sqrtf(nX * nX + nY * nY + FOCAL * FOCAL);
+            Vec3 rayDir = {(nX * right.x + nY * up.x + FOCAL * forward.x) * inv,
+                           (nX * right.y + nY * up.y + FOCAL * forward.y) * inv,
+                           (nX * right.z + nY * up.z + FOCAL * forward.z) * inv};
 
             Vec3 hit;
-            double dist;
-            int hitResult = raymarch(cameraPos, rayDir, &hit, &dist);
-
-            if (hitResult) {
-                double maxDist = 25.0;  // distance at which it's fully "light"
-                double minDist = 5.0;
-                double t = (dist - minDist) / (maxDist - minDist);
-                if (t < 0.0)
-                    t = 0.0;
-                if (t > 1.0)
-                    t = 1.0;
+            float dist;
+            if (raymarch(cameraPos, rayDir, &hit, &dist)) {
+                const float maxDist = 25.0f;  // distance at which it's fully "light"
+                const float minDist = 5.0f;
+                float t = (dist - minDist) / (maxDist - minDist);
+                if (t < 0.0f)
+                    t = 0.0f;
+                if (t > 1.0f)
+                    t = 1.0f;
 
                 // smoothstep: 3t² – 2t³
-                t = t * t * (3.0 - 2.0 * t);
+                t = t * t * (3.0f - 2.0f * t);
 
-                int shades = sizeof(shadings) - 1;
-                int idx = (int)((1.0 - t) * (shades - 1));
-                backgroundArray[y * width + x] = shadings[idx];
+                int idx = (int)((1.0f - t) * (shades - 1));
+                row[x] = shadings[idx];
             } else {
-                backgroundArray[y * width + x] = ' ';
+                row[x] = ' ';
             }
         }
     }
@@ -146,11 +157,13 @@ void init(int w, int h, char* buffer) {
 }
 EMSCRIPTEN_KEEPALIVE
 void update(double time) {
-    cameraPos.x = sqrt(2) * time / 20000.0;
-    cameraPos.y = sqrt(3) * time / 20000.0;
-    cameraDir.x = sqrt(2) * time / 40000.0;
-    cameraDir.y = sqrt(3) * time / 40000.0;
-    cameraDir.z = sqrt(4) * time / 40000.0;
+    // the lattice repeats every WRAP and the angles every turn, so folding both
+    // keeps the floats small no matter how long the page has been open
+    cameraPos.x = fmod(sqrt(2) * time / 20000.0, WRAP);
+    cameraPos.y = fmod(sqrt(3) * time / 20000.0, WRAP);
+    cameraDir.x = fmod(sqrt(2) * time / 40000.0, 2 * M_PI);
+    cameraDir.y = fmod(sqrt(3) * time / 40000.0, 2 * M_PI);
+    cameraDir.z = fmod(sqrt(4) * time / 40000.0, 2 * M_PI);
 
     render();
 }
