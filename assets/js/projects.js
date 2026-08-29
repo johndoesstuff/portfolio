@@ -2,11 +2,17 @@ import initWasm from "/assets/c/build/fluid.js";
 
 let projects =
     [
+		{
+			img : "topolang.png",
+			title : "Topolang",
+			description : "Esoteric language based on the 'topology' of images. Different contiguous blocks define sets which can be reduced in a lambda-calculus adjacent core. Do to it's structuring and implementation, it is the only programming language I know of that can be executed despite any distortions or topology-preserving transforms. Written in C++ and compiled to WASM using em++, you can try it online.",
+			link : "https://johndoesstuff.github.io/topolang/",
+		},
         {
             img : "unibl.png",
             title : "UNIBL Assembler & Virtual Machine",
             description :
-                "In an attempt to make a universal bootstrappable computational architecture I designed the UNIBL Assembler including a preprocessor and directives along with an assembler and virtual machine with a self defining standard library to initialize macros and stack calls. All of this was made using Bison, Yacc, and ANSI C.",
+                "In an attempt to make a universal bootstrappable computational architecture I designed the UNIBL Assembler including a preprocessor and directives along with an assembler and virtual machine with a self defining standard library to initialize macros and stack calls. All of this was made using Bison, Yacc, and C.",
             link : "https://github.com/johndoesstuff/uniblvm",
         },
         {
