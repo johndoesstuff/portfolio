@@ -14,6 +14,19 @@
 		.nobr {
 		  white-space: nowrap;
 		}
+		#john-fact-button {
+			background-color: #00006b;
+			font: inherit;
+			color: rgb(255, 253, 235);
+			padding: 8px;
+			border: 3px solid #00006b;
+			border-radius: 3px;
+			cursor: pointer;
+		}
+		#john-fact-button:hover {
+			color: #00006b;
+			background-color: rgb(255, 253, 235);
+		}
 	</style>
 </head>
 <body>
@@ -55,6 +68,10 @@
 			<br><br>
 			<h3>Beyond Code</h3>
 			<span>Outside of programming, I have experience in robotics, engineering, and hands-on hardware projects. I enjoy blending software and hardware to create innovative solutions and constantly seek new ways to refine my skills and explore emerging technologies.</span>
+			<br><br>
+			<button id="john-fact-button" onclick="randomJohnFact()">Click me for a John Fact</button>
+			<br><br>
+			<span id="john-fact"></span>
 		</div>
 	</div>
 	<script src="/assets/js/about.js"></script>
