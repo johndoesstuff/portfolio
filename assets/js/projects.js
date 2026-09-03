@@ -5,7 +5,7 @@ let projects =
 		{
 			img : "topolang.png",
 			title : "Topolang",
-			description : "Esoteric language based on the 'topology' of images. Different contiguous blocks define sets which can be reduced in a lambda-calculus adjacent core. Do to it's structuring and implementation, it is the only programming language I know of that can be executed despite any distortions or topology-preserving transforms. Written in C++ and compiled to WASM using em++, you can try it online.",
+			description : "Esoteric language based on the 'topology' of images. Different contiguous blocks define sets which can be reduced in a lambda-calculus adjacent core. Do to it's structuring and implementation, it is the only programming language I know of that can be executed despite any distortions or topology-preserving transforms. Written in C++ and compiled to WASM using em++. Try it online. Right now. Click the link above. You know you want to..",
 			link : "https://johndoesstuff.github.io/topolang/",
 		},
         {
@@ -14,6 +14,13 @@ let projects =
             description :
                 "In an attempt to make a universal bootstrappable computational architecture I designed the UNIBL Assembler including a preprocessor and directives along with an assembler and virtual machine with a self defining standard library to initialize macros and stack calls. All of this was made using Bison, Yacc, and C.",
             link : "https://github.com/johndoesstuff/uniblvm",
+        },
+        {
+            img : "rubiksrays.png",
+            title : "Rubiks Cube CLI",
+            description :
+                "Fully functional Rubiks Cube with animations and whatnot entirely in your terminal! Written in C++ with a custom rendering process entirely from scratch (other than matrix multiplication and character manipulation tools from GLM and FTXUI). Try it *right now* by clicking the link above!!",
+            link : "https://johndoesstuff.github.io/rubiksrays/",
         },
         {
             img : "mincc.png",
@@ -42,13 +49,6 @@ let projects =
             description :
                 "For HackFax 2025 my team built a wind tunnel from scratch and I designed a custom UI for the physical wind tunnel system that measures drag and lift on airfoils using load cells and an anemometer. Built entirely from scratch with no external libraries, the interface communicates with the tunnel via the Web Serial API to stream real-time sensor data, control wind speed, and generate aerodynamic profiles at varying angles of attack.",
             link : "https://github.com/johndoesstuff/hackfax2025",
-        },
-        {
-            img : "rubiksrays.png",
-            title : "Rubiks Cube CLI",
-            description :
-                "To shapen my knowledge of C++ and the 3D rendering pipeline I created a fully functional Rubiks Cube that operates entirely in the terminal. The rendering process was written entirely from scratch other than matrix multiplication and character manipulation tools from GLM and FTXUI.",
-            link : "https://github.com/johndoesstuff/rubiksrays",
         },
         {
             img : "portfolio.png",
