@@ -33,6 +33,10 @@ const johnFacts = [
 	"A long time before I made a math/programming Youtube channel I ran a moderately popular Geometry Dash Youtube channel.. I will not say any more than that though as it is kindof cringe for me to look back on.",
 	"I don't actually know how to factor. I was absent the day they taught us in 7th grade and I have made an active effort to avoid learning as part of a running joke. I am currently a math minor and have yet to need it for anything.",
 	"APL is my least favorite programming language ever. I am sorry APL fans, there are objectively cool things about it, but I just find it insufferable to try and do anything with.",
+	"When I use earbuds I only use the left one. This is because I always like to have at least one ear open for listening to the outside world.",
+	"I am left handed. I have read that probably means something significant for me psychologically, but I am unsure what to really derive from it other than that writing with a pen is annoying.",
+	"I have never sneezed 3 or more times in a row. I have only sneezed up to twice in a row. Every time I sneeze I secretly hope it is the time I get to finally achieve 3 in a row, but it never happens.",
+	"I used to drink a lot of coffee but now it upsets my stomach and I can only drink tea. I brew one glass of black tea every morning before I do anything else.",
 ];
 
 function randomJohnFact() {
